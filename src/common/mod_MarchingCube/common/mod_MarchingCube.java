@@ -21,6 +21,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 public class mod_MarchingCube
 {
 	public static Block marchingCubeBlock;
+	public static Block fillerCubeBlock;
 	
 	@SidedProxy(clientSide = "mod_MarchingCube.client.ClientProxy", serverSide = "mod_MarchingCube.common.CommonProxy")
     public static CommonProxy proxy;
@@ -28,7 +29,7 @@ public class mod_MarchingCube
 	@Instance("mod_MarchingCube")
 	public static mod_MarchingCube instance;
 	
-	private static int reservedBlockId;
+	private static int[] reservedBlockIds = { 250, 251 };
 
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event)
@@ -37,7 +38,8 @@ public class mod_MarchingCube
 		try 
 		{
 			cfg.load();
-			reservedBlockId = cfg.get(Configuration.CATEGORY_BLOCK, "marchingCubeBlock", 250).getInt(250);
+			reservedBlockIds[0] = cfg.getTerrainBlock(Configuration.CATEGORY_BLOCK, "marchingCubeBlock", 250, "Marching cube block").getInt(250);
+			reservedBlockIds[1] = cfg.getTerrainBlock(Configuration.CATEGORY_BLOCK, "fillerCubeBlock", 251, "Filler cube block").getInt(251);
 		}
 		catch (Exception e)
 		{
@@ -55,11 +57,19 @@ public class mod_MarchingCube
 		proxy.registerRenderThings();
 		
 		// Constructor args: Block Id, Texture page location
-		marchingCubeBlock = new MarchingCubeBlock(reservedBlockId, 0).setBlockName("marchingCubeBlock").setHardness(0.5f);
+		marchingCubeBlock = new MarchingCubeBlock(reservedBlockIds[0], 0)
+								.setBlockName("marchingCubeBlock")
+								.setHardness(0.5f);
+		
+		fillerCubeBlock = new FillerCubeBlock(reservedBlockIds[1], 0)
+								.setBlockName("fillerCubeBlock")
+								.setHardness(0.5f);
 		
 		GameRegistry.registerBlock(marchingCubeBlock);
+		GameRegistry.registerBlock(fillerCubeBlock);
 		
 		LanguageRegistry.addName(marchingCubeBlock, "Marching Cube Block");
+		LanguageRegistry.addName(fillerCubeBlock, "Filler Cube Block");
 	}
 
 }

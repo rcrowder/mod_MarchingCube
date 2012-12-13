@@ -33,7 +33,7 @@ public class RenderMarchingCube implements ISimpleBlockRenderingHandler
         Tessellator var5 = Tessellator.instance;
         int var6 = block.blockIndexInTexture;
 
-        float var9 = 0.015625F;
+        float var9 = 0.5f;//0.015625F;
 
         int var7 = (var6 & 15) << 4;
         int var8 = var6 & 240;
@@ -57,12 +57,6 @@ public class RenderMarchingCube implements ISimpleBlockRenderingHandler
         var5.addVertexWithUV((double)(var21 + var23 + var24), (double)((float)y + var9), (double)(var22 - var23 + var24), var12, var14);
         var5.addVertexWithUV((double)(var21 - var23 + var24), (double)((float)y + var9), (double)(var22 - var23 - var24), var12, var16);
         var5.addVertexWithUV((double)(var21 - var23 - var24), (double)((float)y + var9), (double)(var22 + var23 - var24), var10, var16);
-        
-        var5.setColorOpaque_I((block.getBlockColor() & 16711422) >> 1);
-        var5.addVertexWithUV((double)(var21 - var23 - var24), (double)((float)y + var9), (double)(var22 + var23 - var24), var10, var16);
-        var5.addVertexWithUV((double)(var21 - var23 + var24), (double)((float)y + var9), (double)(var22 - var23 - var24), var12, var16);
-        var5.addVertexWithUV((double)(var21 + var23 + var24), (double)((float)y + var9), (double)(var22 - var23 + var24), var12, var14);
-        var5.addVertexWithUV((double)(var21 + var23 - var24), (double)((float)y + var9), (double)(var22 + var23 + var24), var10, var14);
         
         return true;
     }

@@ -1,7 +1,7 @@
 mod_MarchingCube
 ================
 
-A custom Minecraft block to implement and test out the render of marching cubes.
+Custom Minecraft blocks to implement and test out the render of marching cubes, and other filler type blocks.
 
 E.g.<br>
  http://paulbourke.net/geometry/polygonise/<br>

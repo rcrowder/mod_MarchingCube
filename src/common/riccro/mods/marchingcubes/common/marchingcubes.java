@@ -34,6 +34,8 @@ public class marchingcubes
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event)
 	{
+		instance = this;
+		
 		Configuration cfg = new Configuration(event.getSuggestedConfigurationFile());
 		try 
 		{

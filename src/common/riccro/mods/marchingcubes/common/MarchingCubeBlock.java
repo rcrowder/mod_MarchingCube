@@ -54,15 +54,6 @@ public class MarchingCubeBlock extends Block
 	}
 
     /**
-     * Called right before the block is destroyed by a player.  Args: world, x, y, z, metaData
-     */
-	@Override
-    public void onBlockDestroyedByPlayer(World par1World, int par2, int par3, int par4, int par5)
-    {
-		FMLLog.info("onBlockDestroyedByPlayer [%d %d %d] %d", par2, par3, par4, par5);
-    }
-
-    /**
      * Lets the block know when one of its neighbor changes. Doesn't know which neighbor changed (coordinates passed are
      * their own) Args: x, y, z, neighbor blockID
      */
@@ -74,23 +65,4 @@ public class MarchingCubeBlock extends Block
 		else
 			FMLLog.info("onNeighborBlockChange [%d %d %d] %d", par2, par3, par4, par5);
     }
-
-    /**
-     * Called upon block activation (right click on the block.)
-     */
-	@Override
-    public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int sideClicked, float dx, float dy, float dz)
-    {
-		FMLLog.info("onBlockActivated [%d %d %d] (%d [%f %f %f?])", par2, par3, par4, sideClicked,dx,dy,dz);
-        return false;
-    }
-
-    /**
-     * Called when the block is clicked by a player. Args: x, y, z, entityPlayer
-     */
-	@Override
-    public void onBlockClicked(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer)
-	{
-		FMLLog.info("onBlockClicked [%d %d %d]", par2, par3, par4);
-	}
 }

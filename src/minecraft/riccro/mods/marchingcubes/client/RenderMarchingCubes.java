@@ -1,14 +1,16 @@
 package riccro.mods.marchingcubes.client;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.glu.GLU;
-
 import net.minecraft.src.Block;
-import net.minecraft.src.GLAllocation;
+import net.minecraft.src.ChunkCoordinates;
 import net.minecraft.src.IBlockAccess;
+import net.minecraft.src.Material;
 import net.minecraft.src.RenderBlocks;
-import net.minecraft.src.RenderHelper;
 import net.minecraft.src.Tessellator;
+
+import org.lwjgl.opengl.GL11;
+
+import riccro.mods.marchingcubes.common.FillerCubeBlock;
+import riccro.mods.marchingcubes.common.marchingcubes;
 import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
@@ -32,27 +34,21 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         return false;
     }
 
-    /**
-     * Checks for an OpenGL error. If there is one, prints the error ID and error string.
-     */
-    private void checkGLError(String par1Str)
-    {
-        int var2 = GL11.glGetError();
-
-        if (var2 != 0)
-        {
-            String var3 = GLU.gluErrorString(var2);
-            System.out.println("########## GL ERROR ##########");
-            System.out.println("@ " + par1Str);
-            System.out.println(var2 + ": " + var3);
-        }
-    }
-
+	public static ChunkCoordinates[] faceBlockOffsets = 
+	{
+		new ChunkCoordinates( 0,  0,  1),
+		new ChunkCoordinates( 0,  0, -1),
+		new ChunkCoordinates(-1,  0,  0),
+		new ChunkCoordinates( 1,  0,  0),
+		new ChunkCoordinates( 0,  1,  0),
+		new ChunkCoordinates( 0, -1,  0)
+	};
+	
+	public static int[] faceBlockIds = new int[faceBlockOffsets.length]; 
+	
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
     {
-    	//checkGLError("RMC");
-    	
     	Tessellator var5 = Tessellator.instance;
         if (var5.isDrawing)
         {
@@ -63,11 +59,11 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         int mode = var5.drawMode;
 
         var5.startDrawing(GL11.GL_TRIANGLES);
-        //var5.setColorOpaque_I(block.getBlockColor());
-        var5.setColorOpaque_I(128);
         
-        //GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_CULL_FACE);
+        var5.setColorOpaque_I(block.getBlockColor());
+        //var5.setColorOpaque_I(128);
+        
+        //GL11.glDisable(GL11.GL_CULL_FACE);
 
         int var6 = block.blockIndexInTexture;
         int var7 = (var6 & 15) << 4;
@@ -77,16 +73,32 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         double var14 = (double)((float)var8 / 256.0F);
         double var16 = (double)(((float)var8 + 15.99F) / 256.0F);
 
-        var5.addVertexWithUV(x+0.5, y+0.5, z+0.5, var10, var14);
-        var5.addVertexWithUV(x+1.5, y+0.5, z+1.5, var12, var14);
-        var5.addVertexWithUV(x-1.5, y+0.5, z+1.5, var12, var16);
+        if (block.blockID == marchingcubes.instance.fillerCubeBlock.blockID)
+        {
+            for (int var9 = 0; var9 < faceBlockOffsets.length; var9++)
+            {
+                int id = world.getBlockId(	x + faceBlockOffsets[var9].posX, 
+            								y + faceBlockOffsets[var9].posY,
+            								z + faceBlockOffsets[var9].posZ);
+                
+               	faceBlockIds[var9] = id;
+            }
+	        
+            if (faceBlockIds[5] > 0)
+            {
+	            var5.addVertexWithUV(x+0.5, y+0.5, z+0.5, var10, var14);
+		        var5.addVertexWithUV(x,     y    , z+1.0, var12, var14);
+		        var5.addVertexWithUV(x+1.0, y    , z+1.0, var12, var16);
+            }
+        }
+        else
+        if (block.blockID == marchingcubes.instance.marchingCubeBlock.blockID)
+        {
+        }
         
         var5.draw();
 
-        GL11.glEnable(GL11.GL_CULL_FACE);
-        //GL11.glEnable(GL11.GL_LIGHTING);
-
-        //checkGLError("RMC");
+        //GL11.glEnable(GL11.GL_CULL_FACE);
 
         // After changing to GL_TRIANGLES, we need 
         // to change back to the previous draw mode.

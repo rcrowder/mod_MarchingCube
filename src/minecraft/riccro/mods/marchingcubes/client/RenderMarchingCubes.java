@@ -34,17 +34,31 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         return false;
     }
 
-	public static ChunkCoordinates[] faceBlockOffsets = 
-	{
-		new ChunkCoordinates( 0,  0,  1),
-		new ChunkCoordinates( 0,  0, -1),
-		new ChunkCoordinates(-1,  0,  0),
-		new ChunkCoordinates( 1,  0,  0),
-		new ChunkCoordinates( 0,  1,  0),
-		new ChunkCoordinates( 0, -1,  0)
-	};
+	public static ChunkCoordinates[][] faceOffsets = 
+		{
+			// Forward first (back-spin like a foosball player)
+			{
+				new ChunkCoordinates(0,  0,  1),	// Forward
+				new ChunkCoordinates(0,  1,  1),
+				new ChunkCoordinates(0,  1,  0),	// Up
+				new ChunkCoordinates(0,  1, -1),
+				new ChunkCoordinates(0,  0, -1),	// Back
+				new ChunkCoordinates(0, -1, -1),
+				new ChunkCoordinates(0, -1,  0),	// Down
+				new ChunkCoordinates(0, -1,  1)
+			},
+			// Left and Right
+			{
+				new ChunkCoordinates( 1, -1,  0),
+				new ChunkCoordinates( 1,  0,  0),	// Left
+				new ChunkCoordinates( 1,  1,  0),
+				new ChunkCoordinates(-1,  1,  0),
+				new ChunkCoordinates(-1,  0,  0),	// Right
+				new ChunkCoordinates(-1, -1,  0)
+			}
+		};
 	
-	public static int[] faceBlockIds = new int[faceBlockOffsets.length]; 
+	public static int[] faceBlockIds = new int[9]; 
 	
     @Override
     public boolean renderWorldBlock(IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
@@ -60,10 +74,10 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
 
         var5.startDrawing(GL11.GL_TRIANGLES);
         
+        // TODO: Neighbour colours
         var5.setColorOpaque_I(block.getBlockColor());
-        //var5.setColorOpaque_I(128);
         
-        //GL11.glDisable(GL11.GL_CULL_FACE);
+        GL11.glDisable(GL11.GL_CULL_FACE);
 
         int var6 = block.blockIndexInTexture;
         int var7 = (var6 & 15) << 4;
@@ -75,21 +89,90 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
 
         if (block.blockID == marchingcubes.instance.fillerCubeBlock.blockID)
         {
-            for (int var9 = 0; var9 < faceBlockOffsets.length; var9++)
+            for (int faceBlockCount = 0; faceBlockCount < faceOffsets[0].length; faceBlockCount += 2)
             {
-                int id = world.getBlockId(	x + faceBlockOffsets[var9].posX, 
-            								y + faceBlockOffsets[var9].posY,
-            								z + faceBlockOffsets[var9].posZ);
-                
-               	faceBlockIds[var9] = id;
+            	int id = 0;
+            	
+            	int edgeBlockCount = 0;
+            	
+            	boolean validEdge = false;
+            	
+        		int index = 0;
+        		
+        		float yOffset = 0.0f;
+        		float zOffset = 0.0f;
+        		
+            	for (int edgeBlockIndex = 0; edgeBlockIndex >= -2; edgeBlockIndex--)
+            	{
+            		index = faceBlockCount + edgeBlockIndex;
+            		
+            		if (index < 0)
+            			index += faceOffsets[0].length;
+           			
+            		yOffset += faceOffsets[0][index].posY;
+            		zOffset += faceOffsets[0][index].posZ;
+            		
+	                id = world.getBlockId(	x + faceOffsets[0][index].posX, 
+	            							y + faceOffsets[0][index].posY,
+	            							z + faceOffsets[0][index].posZ);
+	               	
+	               	if (id >= 0 && Block.blocksList[id] != null)
+	               	{
+	               		// Jump out early, we have hit a block straight away
+	               		//if (id > 0 && edgeBlockIndex == 0)
+	               		//	break;
+	               		
+	               		if (id > 0)
+	               		{
+	               			edgeBlockCount++;
+	               		}
+	               		
+	               		if (edgeBlockCount == 1 && edgeBlockIndex == -2)
+	               			validEdge = true;
+	               		
+	               		if (edgeBlockCount == 2)
+	               			validEdge = true;
+	               	}
+            	}
+
+            	//faceBlockIds[faceBlockCount / 2] = id;
+
+            	//if (validEdge && edgeBlockCount > 0)
+            	{
+            		// Normalise offset vector
+            		yOffset /= 4;
+            		zOffset /= 4;
+            		
+            		// Block centre
+    	            var5.addVertexWithUV(
+    	            		x + 0.5, 
+    	            		y + 0.5, 
+    	            		z + 0.5, 
+    	            		var10, var14);
+    	            
+    		        var5.addVertexWithUV(
+    		        		x, 
+    		        		y + 0.5 + yOffset, 
+    		        		z + 0.5 + zOffset, 
+    		        		var12, var14);
+    		        
+    		        var5.addVertexWithUV(
+    		        		x + 1.0, 
+    		        		y + 0.5 + yOffset, 
+    		        		z + 0.5 + zOffset, 
+    		        		var12, var16);
+
+    		        var6++;
+    		        var7 = (var6 & 15) << 4;
+    		        var8 = var6 & 240;
+    		        var10 = (double)((float)var7 / 256.0F);
+    		        var12 = (double)(((float)var7 + 15.99F) / 256.0F);
+    		        var14 = (double)((float)var8 / 256.0F);
+    		        var16 = (double)(((float)var8 + 15.99F) / 256.0F);
+            	}
             }
-	        
-            if (faceBlockIds[5] > 0)
-            {
-	            var5.addVertexWithUV(x+0.5, y+0.5, z+0.5, var10, var14);
-		        var5.addVertexWithUV(x,     y    , z+1.0, var12, var14);
-		        var5.addVertexWithUV(x+1.0, y    , z+1.0, var12, var16);
-            }
+       		
+            //getFirstUncoveredBlock
         }
         else
         if (block.blockID == marchingcubes.instance.marchingCubeBlock.blockID)
@@ -98,7 +181,7 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         
         var5.draw();
 
-        //GL11.glEnable(GL11.GL_CULL_FACE);
+        GL11.glEnable(GL11.GL_CULL_FACE);
 
         // After changing to GL_TRIANGLES, we need 
         // to change back to the previous draw mode.

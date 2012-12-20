@@ -29,7 +29,7 @@ public class marchingcubes
 	@Instance("marchingcubes")
 	public static marchingcubes instance;
 	
-	private static int[] reservedBlockIds = { 250, 251 };
+	private static int[] reservedBlockIds = { 240, 241 };
 
 	@PreInit
 	public void preInit(FMLPreInitializationEvent event)
@@ -40,8 +40,9 @@ public class marchingcubes
 		try 
 		{
 			cfg.load();
-			reservedBlockIds[0] = cfg.get(Configuration.CATEGORY_BLOCK, "marchingCubeBlockId", 250).getInt(250);
-			reservedBlockIds[1] = cfg.get(Configuration.CATEGORY_BLOCK, "fillerCubeBlockId", 251).getInt(251);
+			
+			reservedBlockIds[0] = cfg.get(Configuration.CATEGORY_BLOCK, "marchingCubeBlockId", 240).getInt(240);
+			reservedBlockIds[1] = cfg.get(Configuration.CATEGORY_BLOCK, "fillerCubeBlockId", 241).getInt(241);
 		}
 		catch (Exception e)
 		{
@@ -59,11 +60,11 @@ public class marchingcubes
 		proxy.registerRenderThings();		
 
 		// Constructor args: Block Id, Texture page location
-		marchingCubeBlock = new MarchingCubeBlock(reservedBlockIds[0], 2)
+		marchingCubeBlock = new MarchingCubeBlock(reservedBlockIds[0], Block.dirt.blockID)
 								.setBlockName("marchingCubeBlock")
 								.setHardness(0.5f);
 		
-		fillerCubeBlock = new FillerCubeBlock(reservedBlockIds[1], 2)
+		fillerCubeBlock = new FillerCubeBlock(reservedBlockIds[1], Block.dirt.blockID)
 								.setBlockName("fillerCubeBlock")
 								.setHardness(0.5f);
 		

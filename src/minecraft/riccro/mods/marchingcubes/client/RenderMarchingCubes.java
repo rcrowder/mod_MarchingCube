@@ -28,12 +28,6 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         return renderId;
     }
 
-    @Override
-    public boolean shouldRender3DInInventory()
-    {
-        return false;
-    }
-
 	public static ChunkCoordinates[][] faceOffsets = 
 		{
 			// Forward first (back-spin like a foosball player)
@@ -71,16 +65,19 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
 			},
 		};
 
-    public static void fillerBlockRenderer(Tessellator var5, int offsetIndex, IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
+    public static void fillerBlockRenderer(Tessellator var5, int planeIndex, IBlockAccess world, int x, int y, int z, Block block, int modelId, RenderBlocks renderer)
     {
         // TODO: Neighbour colours
         //var5.setColorOpaque_I(block.getBlockColor());
         
         int var6 = block.blockIndexInTexture;
 
-        for (int faceBlockCount = 0; faceBlockCount < faceOffsets[offsetIndex].length; faceBlockCount += 2)
+        int var7 = (var6 & 15) << 4;
+        int var8 = var6 & 240;
+
+        for (int faceBlockCount = 0; faceBlockCount < faceOffsets[planeIndex].length; faceBlockCount += 2)
         {
-        	boolean connectedEdge = false;
+        	boolean fillerCubeFound = false;
         	
         	int edgeBlockCount = 0;
         	
@@ -91,25 +88,29 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
     		int edgeBlockIndex = 0;
         	for (; edgeBlockIndex >= -2; edgeBlockIndex--)
         	{
-        		int index = faceBlockCount + edgeBlockIndex;
+        		int offsetIndex = faceBlockCount + edgeBlockIndex;
         		
-        		if (index < 0)
-        			index += faceOffsets[offsetIndex].length;
+        		if (offsetIndex < 0)
+        			offsetIndex += faceOffsets[planeIndex].length;
+        		
+        		if (offsetIndex >= faceOffsets[planeIndex].length)
+        			offsetIndex -= faceOffsets[planeIndex].length;
        			
-        		xOffset += faceOffsets[offsetIndex][index].posX;
-        		yOffset += faceOffsets[offsetIndex][index].posY;
-        		zOffset += faceOffsets[offsetIndex][index].posZ;
+        		xOffset += faceOffsets[planeIndex][offsetIndex].posX;
+        		yOffset += faceOffsets[planeIndex][offsetIndex].posY;
+        		zOffset += faceOffsets[planeIndex][offsetIndex].posZ;
         		
-                int id = world.getBlockId(	x + faceOffsets[offsetIndex][index].posX, 
-            								y + faceOffsets[offsetIndex][index].posY,
-            								z + faceOffsets[offsetIndex][index].posZ);
-               	
+                int id = world.getBlockId(	x + faceOffsets[planeIndex][offsetIndex].posX, 
+            								y + faceOffsets[planeIndex][offsetIndex].posY,
+            								z + faceOffsets[planeIndex][offsetIndex].posZ);
+                
                	if (id > 0 && Block.blocksList[id] != null)
                	{
-           			edgeBlockCount++;
+               		if (Block.opaqueCubeLookup[id])
+               			edgeBlockCount++;
                	
            			if (id == marchingcubes.instance.fillerCubeBlock.blockID)
-           				connectedEdge = true;
+           				fillerCubeFound = true;
                	}
         	}
 
@@ -120,42 +121,59 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         		yOffset /= 4.0;
         		zOffset /= 4.0;
                 
-                int var7 = (var6 & 15) << 4;
-                int var8 = var6 & 240;
                 double var10 = (double)((float)var7 / 256.0F);
+                double var11 = (double)(((float)var7 + 7.99F) / 256.0F);
                 double var12 = (double)(((float)var7 + 15.99F) / 256.0F);
                 double var14 = (double)((float)var8 / 256.0F);
+                double var15 = (double)(((float)var8 + 7.99F) / 256.0F);
                 double var16 = (double)(((float)var8 + 15.99F) / 256.0F);
 
-	            if (!connectedEdge) 
+		        // Block centre
+	            var5.addVertexWithUV(x + 0.5, y + 0.5, z + 0.5, var11, var15);
+	            
+	            if (!fillerCubeFound && edgeBlockCount < 3) 
 	            {		            
-			        // Block centre
-		            var5.addVertexWithUV(x + 0.5, y + 0.5, z + 0.5, var10, var14);
-		            
-		            if (offsetIndex == 0)
+		            if (planeIndex == 0)
 		            {
-				        var5.addVertexWithUV(x,       y + 0.5 + yOffset, z + 0.5 + zOffset, var12, var14);
-				        var5.addVertexWithUV(x + 1.0, y + 0.5 + yOffset, z + 0.5 + zOffset, var12, var16);
+		            	// YZ Plane
+				        var5.addVertexWithUV(x,       y + 0.5 + yOffset, z + 0.5 + zOffset, var10, var15 - ((yOffset * 16.0f) / 256.0f));
+				        var5.addVertexWithUV(x + 1.0, y + 0.5 + yOffset, z + 0.5 + zOffset, var12, var15 - ((yOffset * 16.0f) / 256.0f));
 		            }
 		            else
-		            if (offsetIndex == 1)
+		            if (planeIndex == 1)
 		            {
-				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 0.5 + yOffset, z,       var12, var14);
-				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 0.5 + yOffset, z + 1.0, var12, var16);
+		            	// XY Plane
+				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 0.5 + yOffset, z,       var12, var15 - ((yOffset * 16.0f) / 256.0f));
+				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 0.5 + yOffset, z + 1.0, var10, var15 - ((yOffset * 16.0f) / 256.0f));
 		            }
 		            else
 		            {
-				        var5.addVertexWithUV(x + 0.5 + xOffset, y,       z + 0.5 + zOffset, var12, var14);
-				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 1.0, z + 0.5 + zOffset, var12, var16);
+		            	// XZ Plane
+				        var5.addVertexWithUV(x + 0.5 + xOffset, y,       z + 0.5 + zOffset, var11 + ((xOffset * 16.0f) / 256.0f), var16);
+				        var5.addVertexWithUV(x + 0.5 + xOffset, y + 1.0, z + 0.5 + zOffset, var11 + ((xOffset * 16.0f) / 256.0f), var14);
 		            }
 	            }
 	            else
 	            {
-	            	
+	            	/*
+		            if (offsetIndex == 0)
+		            {
+				        var5.addVertexWithUV(x,       y + 0.5 + yOffset/2, z + 0.5 + zOffset/2, var12, var14);
+				        var5.addVertexWithUV(x + 0.5, y + 0.5 + yOffset/2, z + 0.5 + zOffset/2, var12, var16);
+		            }
+		            else
+		            if (offsetIndex == 1)
+		            {
+				        var5.addVertexWithUV(x + 0.5 + xOffset/2, y + 0.5 + yOffset/2, z,       var12, var14);
+				        var5.addVertexWithUV(x + 0.5 + xOffset/2, y + 0.5 + yOffset/2, z + 0.5, var12, var16);
+		            }
+		            else
+		            {
+				        var5.addVertexWithUV(x + 0.5 + xOffset/2, y,       z + 0.5 + zOffset/2, var12, var14);
+				        var5.addVertexWithUV(x + 0.5 + xOffset/2, y + 0.5, z + 0.5,           var12, var16);
+		            }
+	            	*/
 	            }
-	            
-	            // Advance page offset
-		        var6++;
         	}
         }
    		
@@ -173,7 +191,7 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
     	Tessellator var5 = Tessellator.instance;
         if (var5.isDrawing)
         {
-        	// Call draw() to clear out existing block drawing.
+        	// Call draw() to clear out any existing block drawing.
         	var5.draw();
         }
 
@@ -208,6 +226,12 @@ public class RenderMarchingCubes implements ISimpleBlockRenderingHandler
         // to change back to the previous draw mode
         var5.startDrawing(mode);
         return true;
+    }
+
+    @Override
+    public boolean shouldRender3DInInventory()
+    {
+        return false;
     }
 
     @Override

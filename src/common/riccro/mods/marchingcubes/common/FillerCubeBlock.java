@@ -43,7 +43,7 @@ public class FillerCubeBlock extends Block
 	@Override
     public boolean isCollidable()
     {
-        return true;//false;
+        return true;
     }
     
     /**

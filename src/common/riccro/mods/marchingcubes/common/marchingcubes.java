@@ -3,6 +3,7 @@ package riccro.mods.marchingcubes.common;
 import java.util.logging.Level;
 
 import net.minecraft.src.Block;
+import net.minecraft.src.ItemStack;
 import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
@@ -71,7 +72,11 @@ public class marchingcubes
 		GameRegistry.registerBlock(marchingCubeBlock);
 		GameRegistry.registerBlock(fillerCubeBlock);
 		
-		LanguageRegistry.addName(marchingCubeBlock, "Marching Cube Block");
+    	GameRegistry.addShapelessRecipe(
+    			new ItemStack(marchingcubes.fillerCubeBlock, 4), 
+    			new Object[] {Block.cobblestone, Block.cobblestone, Block.dirt, Block.sand});
+
+    	LanguageRegistry.addName(marchingCubeBlock, "Marching Cube Block");
 		LanguageRegistry.addName(fillerCubeBlock, "Filler Cube Block");
 	}
 

@@ -15,6 +15,7 @@ http://www.minecraftforge.net/forum/<br>
 Relevant links;<br>
 http://binarymage.com/ - XCompWiz's Dev Blog (Mystcraft)
 
+BTC donations 1Bj7r8oEwkgo4f1f52ACAvD1n3KufzrbtD
 
 <script src="http://coinwidget.com/widget/coin.js"></script>
 <script>

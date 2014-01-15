@@ -15,12 +15,12 @@ http://www.minecraftforge.net/forum/<br>
 Relevant links;<br>
 http://binarymage.com/ - XCompWiz's Dev Blog (Mystcraft)
 
-BTC donations 1Bj7r8oEwkgo4f1f52ACAvD1n3KufzrbtD
+BTC donations 1NxBTxKUXaGuUBF2VTfnmUpsVJDjSBHw4J
 
 <script src="http://coinwidget.com/widget/coin.js"></script>
 <script>
 CoinWidgetCom.go({
-	wallet_address: "1Bj7r8oEwkgo4f1f52ACAvD1n3KufzrbtD"
+	wallet_address: "1NxBTxKUXaGuUBF2VTfnmUpsVJDjSBHw4J"
 	, currency: "bitcoin"
 	, counter: "count"
 	, alignment: "bl"
@@ -32,8 +32,3 @@ CoinWidgetCom.go({
 	, lbl_amount: "BTC"
 });
 </script>
-
-
-
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
-<script type="text/javascript" src="https://blockchain.info//Resources/wallet/pay-now-button.js"></script>

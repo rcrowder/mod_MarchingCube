@@ -16,6 +16,7 @@ Relevant links;<br>
 http://binarymage.com/ - XCompWiz's Dev Blog (Mystcraft)
 
 BTC donations 1NxBTxKUXaGuUBF2VTfnmUpsVJDjSBHw4J
+
 NXT donations 5839134595234418938
 
 <script src="http://coinwidget.com/widget/coin.js"></script>
